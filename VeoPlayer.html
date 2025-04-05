@@ -166,7 +166,7 @@
         const fileInput = document.getElementById('fileInput');
         const channelListDiv = document.getElementById('channelList');
         const filterInput = document.getElementById('filterInput');
-        const videoPlayer = document.getElementById('videoPlayer'); // Use const if not reassigned
+        const videoPlayer = document.getElementById('videoPlayer');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const errorIndicator = document.getElementById('errorIndicator');
         const errorMessage = document.getElementById('errorMessage');
@@ -175,7 +175,7 @@
         const playerMessageText = document.getElementById('playerMessageText');
         const playerLoadingOverlay = document.getElementById('playerLoadingOverlay');
         const playerLoadingText = document.getElementById('playerLoadingText');
-        const playerSpinner = document.getElementById('playerSpinner'); // Spinner icon
+        const playerSpinner = document.getElementById('playerSpinner');
         const channelListContainer = document.getElementById('channelListContainer');
         const initialMessage = document.getElementById('initialMessage');
         const menuToggleButton = document.getElementById('menuToggleButton');
@@ -186,16 +186,15 @@
         let channels = [];
         let currentGroup = null;
         let activeChannelElement = null;
-        // Keep track of listeners to remove them properly
         let currentVideoErrorListener = null;
         let currentVideoCanPlayListener = null;
         let currentVideoWaitingListener = null;
         let currentVideoStalledListener = null;
-        let currentVideoPlayingListener = null; // Added listener for playing state
+        let currentVideoPlayingListener = null;
         let currentHlsErrorListener = null;
 
-        // --- M3U Parsing Functions --- (No changes needed here)
-        function parseExtinf(line) { /* ... same as before ... */
+        // --- M3U Parsing Functions --- (No changes)
+        function parseExtinf(line) { /* ... */
             const info = { duration: '-1', title: 'Canal Desconocido', logo: null, group: null, tvgId: null, tvgName: null };
             try {
                 const mainPart = line.substring(line.indexOf(':') + 1).trim();
@@ -224,7 +223,7 @@
             } catch (error) { console.warn("Error parsing EXTINF line:", line, error); }
             return info;
          }
-        async function parseM3U(m3uContent) { /* ... same as before ... */
+        async function parseM3U(m3uContent) { /* ... */
             console.log("Starting M3U parse...");
             const lines = m3uContent.replace(/\r/g, '').split('\n');
             const parsedChannels = [];
@@ -253,8 +252,8 @@
             return parsedChannels;
          }
 
-        // --- Core Logic: Loading and Processing --- (No changes needed here)
-        async function fetchM3U(url) { /* ... same as before ... */
+        // --- Core Logic: Loading and Processing --- (No changes)
+        async function fetchM3U(url) { /* ... */
              console.log(`Fetching M3U from URL: ${url}`);
              showLoading(true);
              try {
@@ -268,7 +267,7 @@
                  throw new Error(`Failed to fetch list from URL. Check URL and network. (${error.message})`);
              }
         }
-        function readM3UFile(file) { /* ... same as before ... */
+        function readM3UFile(file) { /* ... */
             console.log(`Reading M3U from file: ${file.name}`);
             showLoading(true);
             return new Promise((resolve, reject) => {
@@ -278,7 +277,7 @@
                 reader.readAsText(file);
             });
         }
-        async function processM3UContent(m3uText, sourceDescription) { /* ... same as before ... */
+        async function processM3UContent(m3uText, sourceDescription) { /* ... */
             showLoading(true);
             channels = [];
             renderChannelList([]);
@@ -300,13 +299,13 @@
             } finally { showLoading(false); }
         }
 
-        // --- UI Update Functions ---
-        function showLoading(isLoading) { /* ... same as before ... */
+        // --- UI Update Functions --- (No changes)
+        function showLoading(isLoading) { /* ... */
             loadingIndicator.classList.toggle('hidden', !isLoading);
             initialMessage.classList.add('hidden');
             if (isLoading) { channelListDiv.innerHTML = ''; errorIndicator.classList.add('hidden'); }
         }
-        function showError(message) { /* ... same as before ... */
+        function showError(message) { /* ... */
             errorMessage.textContent = message;
             errorIndicator.classList.remove('hidden');
             loadingIndicator.classList.add('hidden');
@@ -314,58 +313,37 @@
             channelListDiv.innerHTML = '';
             showPlayerMessage(`Error loading list: ${message}`, "error");
         }
-
-        /** Shows/hides the loading/buffering overlay on the player. */
-        function showPlayerLoadingOverlay(show, message = "Loading...", isBuffering = false) {
+        function showPlayerLoadingOverlay(show, message = "Loading...", isBuffering = false) { /* ... */
              playerLoadingText.textContent = message;
-             // Show/hide spinner based on whether it's just loading or actually buffering/waiting
              playerSpinner.classList.toggle('hidden', !show);
-             playerSpinner.classList.toggle('animate-spin', show && !isBuffering); // Keep spinning if loading
-             playerSpinner.classList.toggle('text-amber-400', isBuffering); // Change color for buffering?
+             playerSpinner.classList.toggle('animate-spin', show && !isBuffering);
+             playerSpinner.classList.toggle('text-amber-400', isBuffering);
              playerSpinner.classList.toggle('text-sky-400', !isBuffering);
-
              playerLoadingOverlay.classList.toggle('visible', show);
              if (show) {
-                 // Ensure message area is hidden when loading overlay is shown
                  playerMessage.classList.add('opacity-0', 'pointer-events-none');
-                 videoPlayer.classList.remove('hidden'); // Keep video element technically visible
+                 videoPlayer.classList.remove('hidden');
              }
         }
-
-        /** Shows a message in the main player area. */
-        function showPlayerMessage(message, type = "info") {
-            console.log(`Showing player message (${type}): ${message}`); // Log message display
-            let iconClass = 'text-sky-600';
-            let iconCode = '&#xea1d;'; // tv
-            if (type === 'error') {
-                iconClass = 'text-red-500';
-                iconCode = '&#xe911;'; // alert-triangle
-            } else if (type === 'success') {
-                 iconClass = 'text-green-500';
-                 iconCode = '&#xe96d;'; // check-circle
-            }
-
+        function showPlayerMessage(message, type = "info") { /* ... */
+            console.log(`Showing player message (${type}): ${message}`);
+            let iconClass = 'text-sky-600'; let iconCode = '&#xea1d;'; // tv
+            if (type === 'error') { iconClass = 'text-red-500'; iconCode = '&#xe911;'; } // alert-triangle
+            else if (type === 'success') { iconClass = 'text-green-500'; iconCode = '&#xe96d;'; } // check-circle
             playerMessageIcon.className = `lucide text-6xl md:text-7xl ${iconClass} mb-4 md:mb-5 opacity-80`;
             playerMessageIcon.innerHTML = iconCode;
             playerMessageText.textContent = message;
-
-            // Make message area visible and hide video/loading overlay
             playerMessage.classList.remove('opacity-0', 'pointer-events-none');
             videoPlayer.classList.add('hidden');
-            showPlayerLoadingOverlay(false); // Ensure loading overlay is hidden
-
-            cleanupPlayerState(); // Clean up player when showing a persistent message
+            showPlayerLoadingOverlay(false);
+            cleanupPlayerState();
             setActiveChannel(null);
         }
-
-        /** Hides the main player message and shows the video element area. */
-        function showVideoPlayerArea() {
+        function showVideoPlayerArea() { /* ... */
             playerMessage.classList.add('opacity-0', 'pointer-events-none');
             videoPlayer.classList.remove('hidden');
         }
-
-        /** Highlights the active channel in the list. */
-        function setActiveChannel(element) { /* ... same as before ... */
+        function setActiveChannel(element) { /* ... */
             if (activeChannelElement) { activeChannelElement.classList.remove('channel-active'); }
             if (element) {
                 element.classList.add('channel-active');
@@ -373,9 +351,7 @@
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else { activeChannelElement = null; }
         }
-
-        /** Toggles the mobile sidebar visibility. */
-        function toggleMobileSidebar(show) { /* ... same as before ... */
+        function toggleMobileSidebar(show) { /* ... */
             const shouldShow = typeof show === 'boolean' ? show : !channelListContainer.classList.contains('translate-x-0');
             channelListContainer.classList.toggle('translate-x-0', shouldShow);
             sidebarOverlay.classList.toggle('visible', shouldShow);
@@ -383,8 +359,8 @@
         }
 
 
-        // --- Rendering Functions ---
-        function renderChannelList(channelsToRender) { /* ... same as before ... */
+        // --- Rendering Functions --- (No changes)
+        function renderChannelList(channelsToRender) { /* ... */
             channelListDiv.innerHTML = '';
             initialMessage.classList.add('hidden');
             if (channelsToRender.length === 0) {
@@ -396,18 +372,14 @@
             const groups = channelsToRender.reduce((acc, channel) => { const groupName = channel.group || 'Sin Grupo'; if (!acc[groupName]) acc[groupName] = []; acc[groupName].push(channel); return acc; }, {});
             const sortedGroupNames = Object.keys(groups).sort((a, b) => { if (a === 'Sin Grupo') return 1; if (b === 'Sin Grupo') return -1; return a.localeCompare(b, undefined, { sensitivity: 'base' }); });
             sortedGroupNames.forEach((groupName, index) => {
-                const groupChannels = groups[groupName];
-                const channelCount = groupChannels.length;
-                const groupId = `group-${groupName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
+                const groupChannels = groups[groupName]; const channelCount = groupChannels.length; const groupId = `group-${groupName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
                 const groupContainer = document.createElement('div'); groupContainer.className = 'mb-1';
-                const groupHeader = document.createElement('button');
-                groupHeader.className = 'w-full bg-dark-card hover:bg-slate-700/80 p-2.5 rounded-md cursor-pointer flex justify-between items-center sticky top-0 z-5 shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-dark-card';
+                const groupHeader = document.createElement('button'); groupHeader.className = 'w-full bg-dark-card hover:bg-slate-700/80 p-2.5 rounded-md cursor-pointer flex justify-between items-center sticky top-0 z-5 shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-dark-card';
                 groupHeader.setAttribute('aria-expanded', 'false'); groupHeader.setAttribute('aria-controls', groupId);
                 groupHeader.innerHTML = `<h3 class="font-semibold text-sm text-light-text flex items-center truncate pr-2">${groupName}<span class="text-xs text-medium-text ml-2 font-normal bg-slate-600 px-1.5 py-0.5 rounded-full flex-shrink-0">${channelCount}</span></h3><span class="lucide text-base text-medium-text group-arrow flex-shrink-0 transform transition-transform duration-300">&#xe904;</span>`; // chevron-down
                 const channelItemsContainer = document.createElement('div'); channelItemsContainer.id = groupId; channelItemsContainer.className = 'pl-3 pt-1 mt-1 border-l-2 border-dark-border ml-2 group-channels hidden';
                 groupChannels.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })).forEach(channel => {
-                    const channelElement = document.createElement('div');
-                    channelElement.className = 'channel-item flex items-center p-2 pr-3 rounded-md hover:bg-slate-700/70 cursor-pointer transition-all duration-150 ease-in-out group focus:outline-none';
+                    const channelElement = document.createElement('div'); channelElement.className = 'channel-item flex items-center p-2 pr-3 rounded-md hover:bg-slate-700/70 cursor-pointer transition-all duration-150 ease-in-out group focus:outline-none';
                     channelElement.dataset.url = channel.url; channelElement.dataset.title = channel.title; channelElement.tabIndex = 0;
                     const logoSrc = channel.logo || `https://placehold.co/40x40/1e293b/94a3b8/png?text=${encodeURIComponent(channel.title.charAt(0).toUpperCase() || '?')}`;
                     const logoImg = document.createElement('img'); logoImg.src = logoSrc; logoImg.alt = ``; logoImg.className = 'w-6 h-6 mr-2.5 rounded-md object-contain flex-shrink-0 border-2 border-slate-600 bg-slate-700 group-hover:border-sky-500 transition-colors duration-200'; logoImg.loading = 'lazy';
@@ -424,7 +396,7 @@
                 if (index === 0 || (filterInput.value && sortedGroupNames.length < 10)) { groupHeader.click(); }
             });
          }
-        function filterAndRenderChannels() { /* ... same as before ... */
+        function filterAndRenderChannels() { /* ... */
             const filterText = filterInput.value.toLowerCase().trim();
             if (!channels) return;
             const filteredChannels = channels.filter(channel => channel.title.toLowerCase().includes(filterText) || (channel.group && channel.group.toLowerCase().includes(filterText)) || (channel.tvgId && channel.tvgId.toLowerCase().includes(filterText)) || (channel.tvgName && channel.tvgName.toLowerCase().includes(filterText)));
@@ -438,21 +410,23 @@
              console.log("Cleaning up player state...");
              if (hls) {
                  if (currentHlsErrorListener) { hls.off(Hls.Events.ERROR, currentHlsErrorListener); currentHlsErrorListener = null; }
-                 // Remove other HLS listeners if added
                  hls.destroy(); hls = null; console.log("HLS instance destroyed.");
              }
              videoPlayer.pause();
-             // Remove specific video event listeners
              if (currentVideoErrorListener) videoPlayer.removeEventListener('error', currentVideoErrorListener);
              if (currentVideoCanPlayListener) videoPlayer.removeEventListener('canplay', currentVideoCanPlayListener);
              if (currentVideoWaitingListener) videoPlayer.removeEventListener('waiting', currentVideoWaitingListener);
              if (currentVideoStalledListener) videoPlayer.removeEventListener('stalled', currentVideoStalledListener);
-             if (currentVideoPlayingListener) videoPlayer.removeEventListener('playing', currentVideoPlayingListener); // Remove playing listener
+             if (currentVideoPlayingListener) videoPlayer.removeEventListener('playing', currentVideoPlayingListener);
              currentVideoErrorListener = null; currentVideoCanPlayListener = null;
              currentVideoWaitingListener = null; currentVideoStalledListener = null;
-             currentVideoPlayingListener = null; // Reset playing listener ref
+             currentVideoPlayingListener = null;
 
              videoPlayer.removeAttribute('src');
+             // Remove source elements as well if they were added
+             while (videoPlayer.firstChild) {
+                videoPlayer.removeChild(videoPlayer.firstChild);
+             }
              try { videoPlayer.load(); console.log("videoPlayer.load() called after cleanup."); }
              catch (e) { console.warn("Warning calling video.load() during cleanup:", e); }
         }
@@ -464,48 +438,40 @@
          */
         function playChannel(url, title) {
             console.log(`%cAttempting to play: ${title} (${url})`, 'color: yellow; font-weight: bold;');
-            // **IMPORTANT:** Check browser console (F12) for errors, especially CORS related.
             showVideoPlayerArea();
             showPlayerLoadingOverlay(true, `Loading: ${title}...`);
 
             cleanupPlayerState(); // Clean up before starting new playback
 
+            // --- Determine Stream Type ---
+            // Prioritize HLS if HLS.js is supported or native support exists
             const isM3U8 = url.toLowerCase().includes('.m3u8') || url.toLowerCase().includes('manifest(format=m3u8');
+            const canNativePlayHLS = videoPlayer.canPlayType('application/vnd.apple.mpegurl'); // Check native HLS support
 
-            // --- Setup Video Element Listeners ---
+            // --- Setup Video Element Listeners (Common for all types) ---
             currentVideoErrorListener = (e) => {
                  console.error("Video Element Error:", e);
-                 // Log more details if available
-                 if (videoPlayer.error) {
-                    console.error(`- Code: ${videoPlayer.error.code}, Message: ${videoPlayer.error.message}`);
-                 } else {
-                    console.error("- No videoPlayer.error details available.");
-                 }
-
+                 if (videoPlayer.error) { console.error(`- Code: ${videoPlayer.error.code}, Message: ${videoPlayer.error.message}`); }
+                 else { console.error("- No videoPlayer.error details available."); }
                  let errorMsg = `Error playing: ${title}`;
                  if (videoPlayer.error) {
                      switch (videoPlayer.error.code) {
-                         case MediaError.MEDIA_ERR_ABORTED: errorMsg += ' (Aborted by user or script)'; break;
-                         case MediaError.MEDIA_ERR_NETWORK: errorMsg += ' (Network error). Check connection or CORS policy.'; break;
-                         case MediaError.MEDIA_ERR_DECODE: errorMsg += ' (Decode error). Media might be corrupt or unsupported format.'; break;
-                         case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMsg += ' (Format not supported or URL invalid/inaccessible). Check URL and CORS.'; break;
+                         case MediaError.MEDIA_ERR_ABORTED: errorMsg += ' (Aborted)'; break;
+                         case MediaError.MEDIA_ERR_NETWORK: errorMsg += ' (Network error). Check connection/URL/CORS.'; break;
+                         case MediaError.MEDIA_ERR_DECODE: errorMsg += ' (Decode error). Media corrupt/unsupported.'; break;
+                         case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMsg += ' (Format/URL not supported by browser). Check URL/CORS.'; break;
                          default: errorMsg += ` (Unknown error code: ${videoPlayer.error.code})`;
                      }
-                 } else {
-                    errorMsg += ' (Unknown video error)';
-                 }
-                 // Suggest checking console
-                 errorMsg += ' Check browser console (F12) for details.';
+                 } else { errorMsg += ' (Unknown video error)'; }
+                 errorMsg += ' Check browser console (F12).';
                  showPlayerMessage(errorMsg, "error");
             };
             videoPlayer.addEventListener('error', currentVideoErrorListener);
 
             currentVideoCanPlayListener = () => {
                 console.log(`%cVideo 'canplay' event for: ${title}. Attempting play...`, 'color: lightgreen;');
-                // Don't hide loading here yet, wait for 'playing'
                 videoPlayer.play().catch(playError => {
                      console.warn(`Autoplay prevented or failed for ${title}:`, playError);
-                     // Show message if autoplay fails after interaction might be needed
                      showPlayerMessage(`Could not autoplay "${title}". Click play button.`, "info");
                 });
             };
@@ -513,115 +479,64 @@
 
             currentVideoWaitingListener = () => {
                 console.log(`%cVideo 'waiting' event (buffering) for: ${title}`, 'color: orange;');
-                showPlayerLoadingOverlay(true, `Buffering: ${title}...`, true); // Show buffering state
+                showPlayerLoadingOverlay(true, `Buffering: ${title}...`, true);
             };
             videoPlayer.addEventListener('waiting', currentVideoWaitingListener);
 
             currentVideoStalledListener = () => {
-                // Stalled can happen if data stops downloading unexpectedly
                 console.warn(`%cVideo 'stalled' event for: ${title}. Data flow interrupted.`, 'color: orange;');
-                // Optionally show buffering or a warning
                 showPlayerLoadingOverlay(true, `Stalled: ${title}...`, true);
             };
             videoPlayer.addEventListener('stalled', currentVideoStalledListener);
 
              currentVideoPlayingListener = () => {
-                 // This is a better indicator that playback has actually started
                  console.log(`%cVideo 'playing' event for: ${title}. Hiding loading overlay.`, 'color: lightgreen; font-weight: bold;');
-                 showPlayerLoadingOverlay(false); // Hide loading/buffering overlay now
+                 showPlayerLoadingOverlay(false);
              };
              videoPlayer.addEventListener('playing', currentVideoPlayingListener);
             // --- End Video Listener Setup ---
 
 
-            // --- Load Source ---
+            // --- Load Source Logic ---
             if (isM3U8 && Hls.isSupported()) {
-                console.log("HLS.js supported. Initializing...");
-                hls = new Hls({
-                     fragLoadingMaxRetry: 4, manifestLoadingMaxRetry: 2, levelLoadingMaxRetry: 3,
-                     // Enable detailed debug logging for HLS.js in console
-                     // debug: true // Uncomment for very verbose HLS logs
-                });
+                // Use HLS.js if it's an M3U8 and HLS.js is supported
+                console.log("HLS.js supported. Initializing for M3U8...");
+                hls = new Hls({ fragLoadingMaxRetry: 4, manifestLoadingMaxRetry: 2, levelLoadingMaxRetry: 3 /*, debug: true*/ });
 
-                // --- Setup HLS Listeners ---
                 currentHlsErrorListener = (event, data) => {
-                    console.error('HLS.js Error:', event, data);
-                    showPlayerLoadingOverlay(false); // Hide loading on HLS error
-
-                    let errorMsg = `HLS Error (${data.type}) playing ${title}.`;
-                    let details = data.details || 'No details';
-                    let fatal = data.fatal;
-
-                    if (data.response) { // Log network response if available
-                        console.error(`- Network Response: Status ${data.response.code}, URL ${data.response.url}`);
-                        if (data.response.code === 0 || data.response.code === 403) {
-                             errorMsg += ' Possible CORS or network issue.';
-                             console.warn(">>> Check Network Tab (F12) for failed requests and CORS headers! <<<");
-                        }
-                    } else {
-                         console.error(`- Details: ${details}`);
-                    }
-                    errorMsg += ` (${details})`;
-
-
+                    console.error('HLS.js Error:', event, data); showPlayerLoadingOverlay(false);
+                    let errorMsg = `HLS Error (${data.type}) playing ${title}.`; let details = data.details || 'No details'; let fatal = data.fatal;
+                    if (data.response) { console.error(`- Network Response: Status ${data.response.code}, URL ${data.response.url}`); if (data.response.code === 0 || data.response.code === 403) { errorMsg += ' Possible CORS/network issue.'; console.warn(">>> Check Network Tab (F12) for CORS headers! <<<"); } }
+                    else { console.error(`- Details: ${details}`); } errorMsg += ` (${details})`;
                     if (fatal) {
                         console.error("HLS Error is FATAL.");
                         switch(data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                errorMsg = `Fatal Network Error loading stream for ${title}. Check connection/URL/CORS. (${details})`;
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                errorMsg = `Fatal Media Error decoding stream for ${title}. Content corrupt or unsupported? (${details})`;
-                                // Attempt recovery? hls.recoverMediaError(); // Might help sometimes
-                                break;
-                            default:
-                                errorMsg = `Fatal HLS error playing ${title}: ${details || data.type}`;
-                        }
-                        errorMsg += ' Check console (F12).';
-                        showPlayerMessage(errorMsg, "error");
-                        // Cleanup handled by showPlayerMessage
-                    } else {
-                        console.warn(`Non-fatal HLS error: ${data.type} - ${details}`);
-                        // Optionally show a temporary warning indicator, but don't stop playback
-                    }
+                            case Hls.ErrorTypes.NETWORK_ERROR: errorMsg = `Fatal Network Error loading stream for ${title}. Check connection/URL/CORS. (${details})`; break;
+                            case Hls.ErrorTypes.MEDIA_ERROR: errorMsg = `Fatal Media Error decoding stream for ${title}. Content corrupt/unsupported? (${details})`; break;
+                            default: errorMsg = `Fatal HLS error playing ${title}: ${details || data.type}`;
+                        } errorMsg += ' Check console (F12).'; showPlayerMessage(errorMsg, "error");
+                    } else { console.warn(`Non-fatal HLS error: ${data.type} - ${details}`); }
                 };
                 hls.on(Hls.Events.ERROR, currentHlsErrorListener);
-
-                // Log other HLS events for debugging
-                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-                    console.log(`%cHLS Manifest parsed for ${title}. Levels: ${data.levels.length}`, 'color: cyan;');
-                });
-                hls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
-                    console.log(`%cHLS Level loaded for ${title}. Bitrate: ${data.details.totalduration}`, 'color: cyan;');
-                });
-                hls.on(Hls.Events.FRAG_BUFFERED, (event, data) => {
-                    // Log fragment buffering (can be very noisy)
-                    // console.log(`HLS Frag buffered: ${data.frag.sn}`);
-                });
-
+                hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => { console.log(`%cHLS Manifest parsed for ${title}. Levels: ${data.levels.length}`, 'color: cyan;'); });
+                hls.on(Hls.Events.LEVEL_LOADED, (event, data) => { console.log(`%cHLS Level loaded for ${title}. Bitrate: ${data.details.totalduration}`, 'color: cyan;'); });
 
                 console.log(`Attaching HLS and loading source: ${url}`);
                 hls.loadSource(url);
                 hls.attachMedia(videoPlayer);
-                // No need to call play here, 'canplay' listener handles it
 
-            } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-                console.log("Native HLS playback supported (e.g., Safari). Setting src directly.");
+            } else {
+                // For non-HLS.js streams OR if HLS.js is not supported
+                // Try setting the src directly and let the browser handle it
+                console.log("Attempting direct playback (Native HLS or other format like MP4, WebM...). Relying on browser support.");
                 videoPlayer.src = url;
-                // 'canplay' listener will handle play()
-            } else if (url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.webm')) {
-                 console.log("Attempting direct playback for MP4/WebM.");
-                 videoPlayer.src = url;
-                 // 'canplay' listener will handle play()
-            }
-            else {
-                console.warn(`Unsupported format or HLS.js not available/needed for: ${url}`);
-                showPlayerMessage(`Cannot play this stream format: ${title}. (Not M3U8, MP4, or WebM?)`, "error");
+                // Note: The 'error' listener added above will catch if the browser cannot play this src.
+                // The 'canplay' listener will attempt to play it if the browser thinks it can.
             }
         }
 
 
-        // --- Event Listeners Setup --- (No changes needed here)
+        // --- Event Listeners Setup --- (No changes)
         loadUrlButton.addEventListener('click', async () => { /* ... */
             const url = m3uUrlInput.value.trim(); if (!url) { showError("Please enter a valid M3U URL."); return; }
             try { const m3uText = await fetchM3U(url); await processM3UContent(m3uText, `URL: ${url}`); }
